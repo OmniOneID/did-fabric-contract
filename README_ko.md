@@ -8,7 +8,6 @@ did-fabric-contract
 ├── CHANGELOG.md
 ├── CLA.md
 ├── CODE_OF_CONDUCT.md
-├── LICENSE.txt
 ├── CONTRIBUTING.md
 ├── MAINTAINERS.md
 ├── README.md
@@ -16,16 +15,16 @@ did-fabric-contract
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│	└── api
-│		└── ContractError.md 
+│   └── api
+│       └── ContractError.md 
 └── source
-	└── SmartContract
+    └── did-fabric-contract
         ├── README.md
         ├── README_ko.md
         ├── chaincode
-		├── go.mod
-		├── go.sum
-		└── main.go
+        ├── go.mod
+        ├── go.sum
+        └── main.go
 ```
 
 |  이름                      |              역할                          |
@@ -34,7 +33,6 @@ did-fabric-contract
 | CLA.md                     | Contributor License Agreement              |
 | CODE_OF_CONDUCT.md         | 기여자의 행동강령                          |
 | CONTRIBUTING.md            | 기여 절차 및 방법                          |
-| LICENSE.txt                | 프로젝트 대한 라이선스                     |
 | MAINTAINERS.md             | 유지관리 가이드                            |
 | README.md                  | 프로젝트의 전체적인 개요 설명              |
 | RELEASE-PROCESS.md         | 릴리즈 절차                                |

@@ -8,7 +8,6 @@ did-fabric-contract
 ├── CHANGELOG.md
 ├── CLA.md
 ├── CODE_OF_CONDUCT.md
-├── LICENSE.txt
 ├── CONTRIBUTING.md
 ├── MAINTAINERS.md
 ├── README.md
@@ -16,16 +15,16 @@ did-fabric-contract
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│	└── api
-│		└── ContractError.md 
+│   └── api
+│       └── ContractError.md 
 └── source
-	└── SmartContract
+    └── did-fabric-contract
         ├── README.md
         ├── README_ko.md
         ├── chaincode
-		├── go.mod
-		├── go.sum
-		└── main.go
+        ├── go.mod
+        ├── go.sum
+        └── main.go
 ```
 
 | Name                    | Description                                     |
@@ -34,7 +33,6 @@ did-fabric-contract
 | CLA.md                  | Contributor License Agreement                   |
 | CODE_OF_CONDUCT.md      | Code of conduct for contributors                |
 | CONTRIBUTING.md         | Contribution guidelines and procedures          |
-| LICENSE.txt             | Licenses for the project                        |
 | MAINTAINERS.md          | General guidelines for maintaining              |
 | README.md               | Overview and description of the project         |
 | RELEASE-PROCESS.md      | Release process                                 |
