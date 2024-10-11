@@ -11,7 +11,7 @@ const (
 	ListProvider         ROLE_TYPE = "ListProvider"
 	OpProvider           ROLE_TYPE = "OpProvider"
 	KycProvider          ROLE_TYPE = "KycProvider"
-	NotificationProvider ROLE_TYPE = "NotivicationProvider"
+	NotificationProvider ROLE_TYPE = "NotificationProvider"
 	LogProvider          ROLE_TYPE = "LogProvider"
 	PortalProvider       ROLE_TYPE = "PortalProvider"
 	DelegationProvider   ROLE_TYPE = "DelegationProvider"
