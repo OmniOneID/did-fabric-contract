@@ -22,37 +22,33 @@ The OpenDID Chaincode provides transaction processing functions related to DID d
 <br>
 
 ## Installation and Deployment
-The following steps guide you on how to easily deploy and execute chaincode using the `network.sh` script in the Hyperledger Fabric test network.
-For detailed instructions on setting up the network, installation, endorsement, and more, please refer to the [Hyperledger Fabric official documentation](https://hyperledger-fabric.readthedocs.io/). <br>
+You can easily set up a Fabric network using the test network provided by Hyperledger Fabric. <br>
+Refer to the [Hyperledger Fabric official documentation - Using the Fabric test network](https://hyperledger-fabric.readthedocs.io/en/latest/test_network.html) for more details on the network setup and chaincode deployment process outlined below.
 1. **Start the Test Network**<br>
-   First, use the following command to start the test network and create a channel.
+   Use the following command to set up the `test-network` composed of two peer organizations and one orderer organization, and create a channel.
    ```bash
-   ./network.sh up createChannel -c [channel name] -ca -s couchdb
+   $ cd fabric-sample/test-network
+   $ ./network.sh up createChannel -c [channel name] -ca -s couchdb
    ```
-2. **Dependency Management**<br>
-   From the root directory of the project, run the `go mod tidy` command to fetch dependencies and keep the `go.mod` and `go.sum` files up to date.
-   ```go
-   go mod tidy
-   ```
-   Then, to include external dependencies, run the `go mod vendor` command to create the `vendor` directory.
-   ```go
-   go mod vendor
-   ```
-3. **Deploying the Chaincode**<br>
-   Finally, run the following command to deploy the chaincode:
+2. **Deploy Chaincode**<br>
+   Clone the `did-fabric-contract` project under the `fabric-sample` directory.
    ```bash
-   ./network.sh deployCC -ccn [chaincode name] -ccp [project path] -ccl go -ccs 1
+   $ cd fabric-sample
+   $ git clone http://gitlab.raondevops.com/opensourcernd/source/server/did-fabric-contract.git
+   ```
+   Go back to the `test-network` directory and execute the following command to deploy the chaincode.
+   ```bash
+   $ cd ./test-network
+   $ ./network.sh deployCC -c [channel name] -ccn [chaincode name] -ccp ../did-fabric-contract/source/did-fabric-contract -ccl go -ccs 1
    ```
 
 <br>
 
 ## Example Execution
-The OpenDID Chaincode leverages the CCKit framework to address issues related to low-level chaincode state operations and complex data processing tasks. 
-Below is an example of calling a specific method in the CCKit-based chaincode to retrieve a DID document from the blockchain.<br>
+The OpenDID Chaincode improves issues such as low-level chaincode state operations and complex data processing tasks by utilizing the `CCKit Framework`.  
+In the `NewOpenDIDCC` function inside the `did-fabric-contract/source/did-fabric-contract/chaincode/opendid.go` file, you can see the various routing paths and methods defined using the `CCKit router` functionality.  
+(For more details on CCKit, refer to the [CCKit Github Repository](https://github.com/hyperledger-labs/cckit).)
 
-For more information on CCKit, refer to the [CCKit GitHub Repository](https://github.com/hyperledger-labs/cckit).
-
-In the `NewOpenDIDCC` function within the `chaincode/opendid.go` file, various routing paths and methods are defined using the `CCKit router` feature. The DID document retrieval function `getDidDoc` can be called externally using the name `document_getDidDoc`.
 ```go
 package chaincode
 
@@ -66,69 +62,82 @@ import (
 	"github.com/hyperledger-labs/cckit/router/param"
 )
 
-
 func NewOpenDIDCC() *router.Chaincode {
 
-	r := router.New(`OpenDID`)
+   r := router.New(`OpenDID`)
 
-	r.Group(`document_`).
-		Query(`getDidDoc`, getDidDoc,
-			param.String("da"),
-			param.String("versionId"))
-   ...
+   r.Init(Init)
 
-	return router.NewChaincode(r)
-}
+   r.Group(`document_`).
+           Invoke(`registDidDoc`, registerDidDoc,
+              param.Struct("InvokedDidDoc", &data.InvokedDidDoc{}),
+              param.String("roleType")).
+           Query(`getDidDoc`, getDidDoc,
+              param.String("da"),
+              param.String("versionId")).
+           Invoke(`updateDidDocStatusInService`, updateDidDocStatusInService,
+              param.String("da"),
+              param.String("status"),
+              param.String("versionId")).
+           Invoke(`updateDidDocStatusRevocation`, updateDidDocStatusRevocation,
+              param.String("da"),
+              param.String("status"),
+              param.String("terminatedTime"))
 
-func getDidDoc(ctx router.Context) (interface{}, error) {
-	da := ctx.ParamString("da")
-	versionId := ctx.ParamString("versionId")
+   r.Group("vcMeta_").
+           Invoke("registVcMetadata", registerVcMetadata,
+              param.Struct("vcMeta", &data.VcMeta{})).
+           Query("getVcMetadata", getVcMetadata,
+              param.String("vcId")).
+           Invoke("updateVcStatus", updateVcStatus,
+              param.String("vcId"),
+              param.String("vcStatus"))
 
-	result, err := service.GetDidDocAndStatus(ctx, da, versionId)
-	if err != nil {
-		return ctx.Response().Error(err), err
-	}
-	return ctx.Response().Success(result), nil
-}
-```
-
-Internally, state processing tasks are performed in `repository/document_repository.go`, and with CCKit's state management features, data stored on the blockchain can be easily retrieved.
-```go
-func GetDidDocLatest(ctx router.Context, did string) (*data.DidDoc, error) {
-	result, err := ctx.State().Get(&data.DidDoc{Id: did})
-	var didDoc *data.DidDoc
-	if err != nil {
-		return nil, GetContractError(DIDDOC_GET_ERROR, err)
-	}
-	if err := json.Unmarshal(result.([]uint8), &didDoc); err != nil {
-		return nil, GetContractError(DIDDOC_CONVERT_ERROR, err)
-	}
-	return didDoc, nil
+   return router.NewChaincode(r)
 }
 ```
+<br>
 
-You can invoke the DID document retrieval function using CLI commands.<br> The following command calls the `document_getDidDoc` function to retrieve a specific DID document with `DID` as `did:open:user` and `versionId` as `1`.
-```bash
-peer chaincode query -C [channel name] -n [chaincode name] -c '{"Args":["document_getDidDoc","did:open:user","1"]"}'
-```
-
-If the command is successful, the result is returned as a Base64-encoded `payload`. An example of the output is as follows:
-```bash
-{"status":200,"payload":"eyJkb2N1...iXX1dfSwic3RhdHVzIjoiQUNUSVZBVEVEIn0"}
-```
-Decoding the `payload` value will reveal the retrieved specific DID document as shown below:
-```json
-{
-  	"document": {
-    	"@context": [
-      		"https://www.w3.org/ns/did/v1"
-    	],
-    	"id": "did:opendid:user",
-		...
-    	"versionId": "1",
-    	"deactivated": false,
-		...
-  	},
-  	"status": "ACTIVATED"
-}
-```
+Below is an example of calling the `document_getDidDoc` API to retrieve a DID document from the blockchain using the `peer` CLI.
+1. **Set Environment Variables**  
+   Set the environment variables in the `test-network` directory to use the `peer` CLI commands.
+   ```bash
+      $ export PATH=${PWD}/../bin:$PATH
+      $ export FABRIC_CFG_PATH=$PWD/../config/
+      
+      $ export CORE_PEER_TLS_ENABLED=true
+      $ export CORE_PEER_LOCALMSPID=Org1MSP
+      $ export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+      $ export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+      $ export CORE_PEER_ADDRESS=localhost:7051
+   ```
+2. **Invoke Chaincode**  
+   The `document_getDidDoc` function is called to retrieve a specific DID document where the DID is `did:open:user` and the versionId is `1`.
+   ```bash
+   $ peer chaincode query -C [channel name] -n [chaincode name] -c '{"Args":["document_getDidDoc","did:open:user","1"]}'
+   ```
+3. **Return Result**  
+   If the command is successful, the result is returned as a `payload` encoded in Base64. The example output is as follows:
+   ```bash
+   {"status":200,"payload":"eyJkb2N1...iXX1dfSwic3RhdHVzIjoiQUNUSVZBVEVEIn0"}
+   ```
+   Decoding the `payload` value will reveal the retrieved specific DID document as shown below:
+   ```json
+   {
+       "document": {
+           "@context": [
+               "https://www.w3.org/ns/did/v1"
+           ],
+           "id": "did:opendid:user",
+           ...
+           "versionId": "1",
+           "deactivated": false,
+           ...
+       },
+       "status": "ACTIVATED"
+   }
+   ```
+   The above example output assumes that there is a previously registered DID document. If no DID document is registered, a `null` value is encoded in Base64 and returned as the `payload`.
+   ```bash
+   {"status":200,"payload":"bnVsbA=="}
+   ```
