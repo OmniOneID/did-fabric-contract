@@ -30,16 +30,3 @@ jobs:
 
       - name: Build the project
         run: go build ./...
-
-      - name: Compress files to zip and tar.gz
-        run: |
-          zip -r "Source code.zip" .
-          tar -czvf "Source code.tar.gz" .
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{ github.sha }}
-          path: |
-            source/did-fabric-contract/Source code.zip
-            source/did-fabric-contract/Source code.tar.gz
