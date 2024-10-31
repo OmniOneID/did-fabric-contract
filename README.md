@@ -26,7 +26,7 @@ did-fabric-contract
     │   ├── chaincode
     │   ├── go.mod
     │   ├── go.sum
-    │   ├── main.go
+    │   └── main.go
     └── release
         ├── Source code.tar.gz
         └── Source code.zip
@@ -51,6 +51,14 @@ did-fabric-contract
 
 ## Releases
 Releases can be found in the [Releases](https://github.com/OmniOneID/did-fabric-contract/releases).
+
+## Change Log
+The Change Log provides a detailed record of version-specific changes and updates. You can find it here:
+- [Change Log](./CHANGELOG.md)
+
+## OpenDID Demonstration Videos <br>
+To watch our demonstration videos of the OpenDID system in action, please visit our [Demo Repository](https://github.com/OmniOneID/did-demo-server). <br>
+These videos showcase key features including user registration, VC issuance, and VP submission processes.
 
 ## Contributing
 
