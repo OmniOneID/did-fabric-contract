@@ -36,7 +36,7 @@ Hyperledger Fabric에서 제공하는 test-network를 사용하여 손쉽게 Fab
    `fabric-sample` 디렉터리 하위에 `did-fabric-contract` 프로젝트를 복제합니다.
    ```bash
    $ cd fabric-sample
-   $ git clone http://gitlab.raondevops.com/opensourcernd/source/server/did-fabric-contract.git
+   $ git clone https://github.com/OmniOneID/did-fabric-contract.git
    ```
    `test-network` 디렉터리로 돌아와서 체인코드 배포를 위해 다음 명령어를 실행합니다.
    ```bash

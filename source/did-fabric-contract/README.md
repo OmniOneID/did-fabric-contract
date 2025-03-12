@@ -34,7 +34,7 @@ Refer to the [Hyperledger Fabric official documentation - Using the Fabric test 
    Clone the `did-fabric-contract` project under the `fabric-sample` directory.
    ```bash
    $ cd fabric-sample
-   $ git clone http://gitlab.raondevops.com/opensourcernd/source/server/did-fabric-contract.git
+   $ git clone https://github.com/OmniOneID/did-fabric-contract.git
    ```
    Go back to the `test-network` directory and execute the following command to deploy the chaincode.
    ```bash
